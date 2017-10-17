@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="1200.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Label fx:id="mainWindow" layoutX="10.0" layoutY="10.0" prefHeight="600.0" prefWidth="900.0" stylesheets="@styles.css" />
+        <Pane fx:id="InfoPanel" layoutX="920.0" layoutY="10.0" prefHeight="600.0" prefWidth="270.0">
+            <children>
+                <Label fx:id="Concentration" layoutX="5.0" layoutY="5.0" prefHeight="30.0" prefWidth="130.0" stylesheets="@styles.css" />
+                <Label fx:id="Strength" layoutX="5.0" layoutY="40.0" prefHeight="30.0" prefWidth="130.0" stylesheets="@styles.css" />
+                <Label fx:id="Agility" layoutX="5.0" layoutY="75.0" prefHeight="30.0" prefWidth="130.0" stylesheets="@styles.css" />
+            </children>
+        </Pane>
+    </children>
+</Pane>
