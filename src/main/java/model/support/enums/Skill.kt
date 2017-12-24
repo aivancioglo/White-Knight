@@ -1,0 +1,47 @@
+package model.support.enums
+
+enum class Skill {
+    // Base warSkills
+    MAIN_BATTLE_EXPERIENCE,
+    HAND_TO_HAND_FIGHT_SKILL,
+    ONE_HANDED_WEAPON_SKILL,
+    TWO_HANDED_WEAPON_SKILL,
+    SHIELD_BLOCK_SKILL,
+    ARMOR_SKILL,
+
+    // Hand to hand warSkills
+    HANDS_FIGHT_SKILL,
+    FOOTS_FIGHT_SKILL,
+    RIGHT_HAND_FIGHT_SKILL,
+    LEFT_HAND_FIGHT_SKILL,
+    RIGHT_FOOT_FIGHT_SKILL,
+    LEFT_FOOT_FIGHT_SKILL,
+
+    // One-handed weapon warSkills
+    KNIFE_SKILL,
+    SWORD_SKILL,
+    AXE_SKILL,
+    MACE_SKILL,
+    HAMMER_SKILL,
+
+    // Two-handed weapon type
+    TWO_HANDED_SWORD_SKILL,
+    TWO_HANDED_AXE_SKILL,
+    TWO_HANDED_MACE_SKILL,
+    TWO_HANDED_HAMMER_SKILL,
+    SPEAR_SKILL,
+    HALBERD_SKILL,
+    STAFF_SKILL,
+
+    // Shield warSkills
+    LIGHT_SHIELD_SKILL,
+    MIDDLE_SHIELD_SKILL,
+    HEAVY_SHIELD_SKILL,
+
+    // Armor warSkills
+    CLOTH_ARMOR_SKILL,
+    LEATHER_ARMOR_SKILL,
+    CHAIN_ARMOR_SKILL,
+    SCALY_ARMOR_SKILL,
+    LAT_ARMOR_SKILL
+}
