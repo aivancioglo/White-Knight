@@ -3,6 +3,8 @@ package model
 import model.support.enums.AttackType
 import model.support.enums.AttackType.*
 import model.support.enums.HitPower
+import model.support.enums.Skill
+import model.support.enums.Skill.*
 import model.support.enums.Specification
 
 data class Technique(val character: Character, val type: AttackType, private val power: HitPower, val specification: Specification) {
@@ -12,6 +14,7 @@ data class Technique(val character: Character, val type: AttackType, private val
     val ferquency = frequency() * power.mod
     val attackDuration = attackDuration() * power.mod
     val defenseDuration = defenceDuration() * power.mod
+    val skillType = skillType()
 
     fun canBeUsed() = type.canUse(character, power, specification)
 
@@ -49,5 +52,11 @@ data class Technique(val character: Character, val type: AttackType, private val
         RIGHT_HAND_ATTACK, LEFT_HAND_ATTACK -> character.handToHandDefenseDuration()
         PRIMARY_WEAPON_ATTACK -> character.primaryWeaponDefenseDuration()
         SECONDARY_WEAPON_ATTACK -> character.secondaryWeaponDefenseDuration()
+    }
+
+    private fun skillType() = when (type) {
+        RIGHT_HAND_ATTACK, LEFT_HAND_ATTACK -> HANDS_FIGHT_SKILL
+        PRIMARY_WEAPON_ATTACK -> character.primaryWeapon().skillType
+        SECONDARY_WEAPON_ATTACK -> character.secondaryWeapon().skillType
     }
 }

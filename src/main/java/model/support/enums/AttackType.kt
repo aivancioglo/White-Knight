@@ -2,8 +2,6 @@ package model.support.enums
 
 import model.Character
 import model.equipment.Equipment.Companion.NONE
-import model.support.Constants.PERCENTAGE
-import model.support.Constants.THIRTY
 import model.support.enums.BodyPart.LEFT_HAND
 import model.support.enums.BodyPart.RIGHT_HAND
 
@@ -11,9 +9,9 @@ enum class AttackType {
     RIGHT_HAND_ATTACK {
         override fun canUse(character: Character, power: HitPower, specification: Specification)
                 = character.equipmentOf(RIGHT_HAND) == NONE &&
-                character.neededStaminaForHandToHandAttack * power.mod < character.stamina() &&
-                character.stamina(PERCENTAGE) > THIRTY &&
-                character.handToHandActionFrequency() * power.mod + character.allTechniquesFrequency() <= character.action &&
+                character.neededStaminaForHandToHandAttack * power.mod < character.stamina() - character.allTechniquesStaminaNeeded() &&
+                character.wantToAttack &&
+                character.handToHandActionFrequency() * power.mod + character.allTechniquesFrequency() <= character.attackAction &&
                 character.handToHandDamage(specification) > 0
     },
 
@@ -21,8 +19,8 @@ enum class AttackType {
         override fun canUse(character: Character, power: HitPower, specification: Specification)
                 = character.equipmentOf(LEFT_HAND) == NONE &&
                 character.neededStaminaForHandToHandAttack * power.mod < character.stamina() &&
-                character.stamina(PERCENTAGE) > THIRTY &&
-                character.handToHandActionFrequency() * power.mod + character.allTechniquesFrequency() <= character.action &&
+                character.wantToAttack &&
+                character.handToHandActionFrequency() * power.mod + character.allTechniquesFrequency() <= character.attackAction &&
                 character.handToHandDamage(specification) > 0
     },
 
@@ -43,17 +41,17 @@ enum class AttackType {
     PRIMARY_WEAPON_ATTACK {
         override fun canUse(character: Character, power: HitPower, specification: Specification) = character.primaryWeaponExist() &&
                 character.neededStaminaForPrimaryWeaponAttack * power.mod < character.stamina() &&
-                character.stamina(PERCENTAGE) > THIRTY &&
-                character.primaryWeaponUsingFrequency() * power.mod + character.allTechniquesFrequency() <= character.action &&
+                character.wantToAttack &&
+                character.primaryWeaponUsingFrequency() * power.mod + character.allTechniquesFrequency() <= character.attackAction &&
                 character.primaryWeaponDamage(specification) > 0
     },
 
     SECONDARY_WEAPON_ATTACK {
         override fun canUse(character: Character, power: HitPower, specification: Specification) = character.secondaryWeaponExist() &&
                 character.neededStaminaForSecondaryWeaponAttack * power.mod < character.stamina() &&
-                        character.stamina(PERCENTAGE) > THIRTY &&
-                        character.secondaryWeaponUsingFrequency() * power.mod + character.allTechniquesFrequency() <= character.action &&
-                        character.secondaryWeaponDamage(specification) > 0
+                character.wantToAttack &&
+                character.secondaryWeaponUsingFrequency() * power.mod + character.allTechniquesFrequency() <= character.attackAction &&
+                character.secondaryWeaponDamage(specification) > 0
     };
 
 //    PRIMARY_KNIFE_ATTACK {

@@ -17,6 +17,7 @@ object Constants {
     val FORTY = 40
     val FIFTY = 50
     val EIGHTY = 80
+    val NINETY = 90
     val HUNDRED = 100
 
     val ACTUAL = "actual"
