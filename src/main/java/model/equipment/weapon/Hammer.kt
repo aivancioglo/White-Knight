@@ -1,10 +1,11 @@
 package model.equipment.weapon
 
-import model.support.enums.Skill.HAMMER_SKILL
+import model.support.enums.Skill
+import model.support.enums.Skill.*
 import model.support.enums.Specification.*
 import model.support.enums.WeaponType.HAMMER
 
-class Hammer(weight: Double, quality: Int) : Weapon(HAMMER, HAMMER_SKILL, weight, quality, true) {
+class Hammer(weight: Double, quality: Int) : Weapon(HAMMER, HAMMER_SKILL, ONE_HANDED_WEAPON_SKILL, weight, quality, true) {
     init {
         damage = mapOf(
                 BLUNT to quality * 0.10,

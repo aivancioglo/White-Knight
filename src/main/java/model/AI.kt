@@ -21,7 +21,7 @@ object AI {
     fun calculatingYourAttackStyle(your: Character, enemy: Character) = when {
         your.stamina(PERCENTAGE) > NINETY -> AGGRESSIVE_OFFENSIVE
         your.stamina(PERCENTAGE) > TEN && your.health() > enemy.maxPossibleDamageTo(your) -> AGGRESSIVE_OFFENSIVE
-        your.stamina(PERCENTAGE) > enemy.stamina(PERCENTAGE) && your.health() > enemy.health() &&
+        your.stamina(PERCENTAGE) > enemy.stamina(PERCENTAGE) &&
                 your.health() > enemy.maxPossibleDamageTo(your) -> AGGRESSIVE_OFFENSIVE
         enemy.onTheKnees && your.stamina(PERCENTAGE) > FIVE -> AGGRESSIVE_OFFENSIVE
         enemy.stamina(PERCENTAGE) < FIVE && your.stamina(PERCENTAGE) > TWENTY -> FORCING

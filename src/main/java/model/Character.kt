@@ -8,9 +8,9 @@ import model.equipment.weapon.Weapon
 import model.support.Constants.ACTUAL
 import model.support.Constants.DEBUFF
 import model.support.Constants.EIGHTY
+import model.support.Constants.FIFTEEN
 import model.support.Constants.FIFTY
 import model.support.Constants.FIVE
-import model.support.Constants.FORTY
 import model.support.Constants.FOUR
 import model.support.Constants.HUNDRED
 import model.support.Constants.INJURIES
@@ -170,27 +170,27 @@ class Character(
     }
 
     fun increaseConcentration(increase: Double) {
-        concentration[MAX] = concentration[MAX]!! + increase
+        concentration[MAX] = concentration(MAX) + increase
         updateStats()
     }
 
     fun increaseStrength(increase: Double) {
-        strength[MAX] = strength[MAX]!! + increase
+        strength[MAX] = strength(MAX) + increase
         updateStats()
     }
 
     fun increaseAgility(increase: Double) {
-        agility[MAX] = agility[MAX]!! + increase
+        agility[MAX] = agility(MAX) + increase
         updateStats()
     }
 
     fun increaseSuppleness(increase: Double) {
-        suppleness[MAX] = suppleness[MAX]!! + increase
+        suppleness[MAX] = suppleness(MAX) + increase
         updateStats()
     }
 
     fun increaseQuickness(increase: Double) {
-        quickness[MAX] = quickness[MAX]!! + increase
+        quickness[MAX] = quickness(MAX) + increase
         updateStats()
     }
 
@@ -525,8 +525,8 @@ class Character(
             SECONDARY_WEAPON_ATTACK -> secondaryWeaponUsingFrequency(ACTUAL)
         }
 
-        increaseTiredness(technique.neededStamina / TWO)
-        stamina[DEBUFF] = stamina(DEBUFF) + technique.neededStamina / TWO
+        increaseTiredness(technique.neededStamina * 0.2)
+        stamina[DEBUFF] = stamina(DEBUFF) + technique.neededStamina * 0.8
         updateStats()
 
         if (!hasNextTechnique())
@@ -540,7 +540,7 @@ class Character(
     fun allTechniquesFrequency(): Double {
         var totalFrequency = 0.0
 
-        battleCombination.forEach { totalFrequency += it.ferquency }
+        battleCombination.forEach { totalFrequency += it.frequency }
 
         return totalFrequency
     }
@@ -553,33 +553,42 @@ class Character(
         return totalStamina
     }
 
-    fun defenseFrom(technique: Technique): DefenseType {
+    fun defenseFrom(enemy: Character): DefenseType {
         defendedLastStep = true
+        val technique = enemy.nextTechniqueUsing()
         val injury = technique.damage - totalDefense(technique.specification)
         val successDodgeIsPossible = successDodgeIsPossible(technique)
         val successShieldUsingIsPossible = successShieldUsingIsPossible(technique)
 
         return when (defenseStyle) {
             STAMINA_DURABILITY -> when {
-                successDodgeIsPossible -> dodge(technique)
-                successShieldUsingIsPossible -> block(technique)
-                else -> injury(technique, injury)
+                successDodgeIsPossible -> dodge(enemy, technique)
+                successShieldUsingIsPossible -> block(enemy, technique)
+                else -> if (onTheKnees)
+                    injury(technique, injury * TWO)
+                else injury(technique, injury)
             }
             QUICK_DEFENSE -> when {
-                shieldUsingDuration() < dodgeDuration() && successShieldUsingIsPossible -> block(technique)
-                successDodgeIsPossible -> dodge(technique)
-                successShieldUsingIsPossible -> block(technique)
-                else -> injury(technique, injury)
+                shieldUsingDuration() < dodgeDuration() && successShieldUsingIsPossible -> block(enemy, technique)
+                successDodgeIsPossible -> dodge(enemy, technique)
+                successShieldUsingIsPossible -> block(enemy, technique)
+                else -> if (onTheKnees)
+                    injury(technique, injury * TWO)
+                else injury(technique, injury)
             }
             SHIELD_MAINLY -> when {
-                successShieldUsingIsPossible -> block(technique)
-                successDodgeIsPossible -> dodge(technique)
-                else -> injury(technique, injury)
+                successShieldUsingIsPossible -> block(enemy, technique)
+                successDodgeIsPossible -> dodge(enemy, technique)
+                else -> if (onTheKnees)
+                    injury(technique, injury * TWO)
+                else injury(technique, injury)
             }
             DODGE_MAINLY -> when {
-                successDodgeIsPossible -> dodge(technique)
-                successShieldUsingIsPossible -> block(technique)
-                else -> injury(technique, injury)
+                successDodgeIsPossible -> dodge(enemy, technique)
+                successShieldUsingIsPossible -> block(enemy, technique)
+                else -> if (onTheKnees)
+                    injury(technique, injury * TWO)
+                else injury(technique, injury)
             }
         }
     }
@@ -591,36 +600,43 @@ class Character(
             technique.attackDuration > shieldUsingDuration() && defenseAction - shieldUsingFrequency() >= 0 &&
             stamina() >= neededStaminaForShieldUsing
 
-    private fun dodge(technique: Technique): DefenseType {
+    private fun dodge(enemy: Character, technique: Technique): DefenseType {
         defenseAction -= dodgeFrequency(ACTUAL)
-        increaseTiredness(neededStaminaToDodge / TWO)
-        stamina[DEBUFF] = stamina(DEBUFF) + neededStaminaToDodge / TWO
+        increaseTiredness(neededStaminaToDodge * 0.2)
+        stamina[DEBUFF] = stamina(DEBUFF) + neededStaminaToDodge * 0.8
         updateStats()
         calculateIfOnTheKneesAfter(technique)
+        updateBattleStyleAgainst(enemy)
         return DODGE
     }
 
-    private fun block(technique: Technique): DefenseType {
+    private fun block(enemy: Character, technique: Technique): DefenseType {
         defenseAction -= shieldUsingFrequency(ACTUAL)
-        increaseTiredness(neededStaminaForShieldUsing / TWO)
-        stamina[DEBUFF] = stamina(DEBUFF) + neededStaminaForShieldUsing / TWO
+        increaseTiredness(neededStaminaForShieldUsing * 0.2)
+        stamina[DEBUFF] = stamina(DEBUFF) + neededStaminaForShieldUsing * 0.8
 
-        val penetration = technique.damage - shieldDefense(technique.specification)
+        val penetration = if (onTheKnees)
+            technique.damage * TWO - shieldDefense(technique.specification)
+        else
+            technique.damage - shieldDefense(technique.specification)
 
         return if (penetration <= 0) {
             updateStats()
             calculateIfOnTheKneesAfter(technique)
+            updateBattleStyleAgainst(enemy)
             BLOCK
         } else {
             injury(technique, penetration)
             updateStats()
             calculateIfOnTheKneesAfter(technique)
+            updateBattleStyleAgainst(enemy)
             PARTIAL_BLOCK
         }
     }
 
     private fun injury(technique: Technique, injury: Double): DefenseType {
-        calculateIfOnTheKneesAfter(technique)
+        if (!onTheKnees)
+            calculateIfOnTheKneesAfter(technique)
 
         return if (injury > 0) {
             increaseInjuries(injury)
@@ -669,7 +685,7 @@ class Character(
     }
 
     private fun calculateHealth() {
-        health[MAX] = strength(MAX) / TWO * TWENTY
+        health[MAX] = strength(MAX) * FIVE + FIVE
         health[ACTUAL] = health(MAX) - health(INJURIES) - health(DEBUFF)
         health[PERCENTAGE] = health() / (health(MAX) / HUNDRED)
 
@@ -680,7 +696,7 @@ class Character(
     }
 
     private fun calculateStamina() {
-        stamina[MAX] = strength(MAX) / TWO * FORTY + agility(MAX) / TWO * FORTY
+        stamina[MAX] = strength(MAX) * ((agility(MAX) + suppleness(MAX) + quickness(MAX)) / THREE) + FIFTEEN
         stamina[ACTUAL] = stamina(MAX) - stamina(TIREDNESS) - stamina(DEBUFF)
         stamina[PERCENTAGE] = stamina() / (stamina(MAX) / HUNDRED)
 
@@ -752,7 +768,9 @@ class Character(
     }
 
     private fun calculateHandToHandStats() {
-        handToHandDamage[BLUNT] = (strength() + skill(HAND_TO_HAND_FIGHT_SKILL) + agility()) / TWO
+        var damage = (TWO * strength() - equipmentWeight) * quickness() * (skill(HAND_TO_HAND_FIGHT_SKILL) + skill(MAIN_BATTLE_EXPERIENCE))
+        if (damage < 0) damage = 0.0
+        handToHandDamage[BLUNT] = damage
         handToHandCriticalDamage[BLUNT] = handToHandDamage(BLUNT) * (ONE + concentration(ACTUAL) / FIVE)
 
         var equipmentBurden = equipmentWeight - strength()
@@ -760,7 +778,7 @@ class Character(
         if (equipmentBurden < 0)
             equipmentBurden = 0.0
 
-        neededStaminaForHandToHandAttack = 0.5 + equipmentBurden
+        neededStaminaForHandToHandAttack = strength() / TEN + equipmentBurden
 
         handToHandActionFrequency[MAX] = (strength() + quickness() - equipmentWeight) / FIVE + TWO
 
@@ -781,7 +799,10 @@ class Character(
     private fun calculatePrimaryWeaponStats() {
         if (primaryWeaponExist()) {
             primaryWeapon().damage.forEach { k, v ->
-                primaryWeaponDamage.put(k, v / FIVE * (strength() * FIVE + skill(primaryWeapon().skillType) + agility() / TEN))
+                var damage = v * ((strength() - equipmentWeight) / primaryWeapon().weight) * quickness() *
+                        (skill(primaryWeapon().skillType) + skill(primaryWeapon().skillGroup) + skill(MAIN_BATTLE_EXPERIENCE))
+                if (damage < 0) damage = 0.0
+                primaryWeaponDamage.put(k, damage)
                 primaryWeaponCriticalDamage.put(k, primaryWeaponDamage(k) * (ONE + concentration(ACTUAL) / FIVE))
             }
 
@@ -790,7 +811,7 @@ class Character(
             if (equipmentBurden < 0)
                 equipmentBurden = 0.0
 
-            neededStaminaForPrimaryWeaponAttack = 0.5 + equipmentBurden
+            neededStaminaForPrimaryWeaponAttack = strength() / TEN + equipmentBurden
 
             primaryWeaponUsingFrequency[MAX] = (strength() + quickness() - primaryWeapon().weight - equipmentWeight) / FIVE + TWO
 
@@ -819,8 +840,11 @@ class Character(
     private fun calculateSecondaryWeaponStats() {
         if (secondaryWeaponExist()) {
             secondaryWeapon().damage.forEach { k, v ->
-                secondaryWeaponDamage.put(k, v / FIVE * (strength() * FIVE + skill(secondaryWeapon().skillType) + agility() / TEN))
-                secondaryWeaponCriticalDamage.put(k, primaryWeaponDamage(k) * (ONE + concentration(ACTUAL) / FIVE))
+                var damage = v * ((strength() - equipmentWeight) / secondaryWeapon().weight) * quickness() *
+                        (skill(secondaryWeapon().skillType) + skill(secondaryWeapon().skillGroup) + skill(MAIN_BATTLE_EXPERIENCE))
+                if (damage < 0) damage = 0.0
+                secondaryWeaponDamage.put(k, damage)
+                secondaryWeaponCriticalDamage.put(k, secondaryWeaponDamage(k) * (ONE + concentration(ACTUAL) / FIVE))
             }
 
             var equipmentBurden = secondaryWeapon().weight + equipmentWeight - strength()
@@ -828,7 +852,7 @@ class Character(
             if (equipmentBurden < 0)
                 equipmentBurden = 0.0
 
-            neededStaminaForSecondaryWeaponAttack = 0.5 + equipmentBurden
+            neededStaminaForSecondaryWeaponAttack = strength() / TEN + equipmentBurden
 
             secondaryWeaponUsingFrequency[MAX] = (strength() + quickness() - secondaryWeapon().weight - equipmentWeight) / FIVE + TWO
 
@@ -861,7 +885,7 @@ class Character(
             if (equipmentBurden < 0)
                 equipmentBurden = 0.0
 
-            neededStaminaForShieldUsing = 0.5 + equipmentBurden
+            neededStaminaForShieldUsing = strength() / TEN + equipmentBurden
 
             shieldUsingFrequency[MAX] = (strength() + quickness() - shield().weight - equipmentWeight) / FIVE + TWO
 
@@ -888,7 +912,7 @@ class Character(
         if (equipmentBurden < 0)
             equipmentBurden = 0.0
 
-        neededStaminaToDodge = 0.5 + equipmentBurden
+        neededStaminaToDodge = strength() / TEN + equipmentBurden
 
         if (neededStaminaToDodge < 0.1)
             neededStaminaToDodge = 0.1
@@ -923,9 +947,7 @@ class Character(
     fun newStep(enemy: Character) {
         updateAction()
         updateStamina()
-        updateAttackStyleFor(enemy)
-        updateDefenseStyleFor(enemy)
-        updateTechniquesFor(enemy)
+        updateBattleStyleAgainst(enemy)
         updateStats()
 
         attackedLastStep = false
@@ -961,7 +983,13 @@ class Character(
         }
     }
 
-    private fun updateAttackStyleFor(enemy: Character) {
+    private fun updateBattleStyleAgainst(enemy: Character) {
+        updateAttackStyleAgainst(enemy)
+        updateDefenseStyleAgainst(enemy)
+        updateTechniquesAgainst(enemy)
+    }
+
+    private fun updateAttackStyleAgainst(enemy: Character) {
         if (ai)
             attackStyle = AI.calculatingYourAttackStyle(this, enemy)
 
@@ -974,12 +1002,12 @@ class Character(
         }
     }
 
-    private fun updateDefenseStyleFor(enemy: Character) {
+    private fun updateDefenseStyleAgainst(enemy: Character) {
         if (ai)
             defenseStyle = AI.calculatingYourDefenseStyle(this, enemy)
     }
 
-    private fun updateTechniquesFor(enemy: Character) {
+    private fun updateTechniquesAgainst(enemy: Character) {
         battleCombination.clear()
 
         if (ai)

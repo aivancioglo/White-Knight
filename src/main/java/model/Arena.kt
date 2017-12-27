@@ -110,7 +110,7 @@ object Arena {
                 }
             }} ${second.whom}")
 
-            result = second.defenseFrom(first.nextTechniqueUsing())
+            result = second.defenseFrom(first)
 
             when (result) {
                 COUNTERATTACK -> writer.writeln(", но ${second.who} контратакует.")
@@ -214,7 +214,7 @@ object Arena {
                 }
             }} ${first.whom}")
 
-            result = first.defenseFrom(second.nextTechniqueUsing())
+            result = first.defenseFrom(second)
 
             when (result) {
                 COUNTERATTACK -> writer.writeln(", но ${first.who} контратакует.")

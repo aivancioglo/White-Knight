@@ -11,6 +11,7 @@ import model.support.enums.WeaponType
 abstract class Weapon(
         val weaponType: WeaponType,
         val skillType: Skill,
+        val skillGroup: Skill,
         weight: Double,
         quality: Int,
         val isOneHanded: Boolean

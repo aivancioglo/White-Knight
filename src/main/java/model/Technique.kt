@@ -11,7 +11,7 @@ data class Technique(val character: Character, val type: AttackType, private val
     val damage = damage() * power.mod
     val criticalDamage = criticalDamage() * power.mod
     val neededStamina = neededStamina() * power.mod
-    val ferquency = frequency() * power.mod
+    val frequency = frequency() * power.mod
     val attackDuration = attackDuration() * power.mod
     val defenseDuration = defenceDuration() * power.mod
     val skillType = skillType()

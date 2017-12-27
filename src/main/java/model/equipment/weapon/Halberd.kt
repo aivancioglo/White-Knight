@@ -1,10 +1,12 @@
 package model.equipment.weapon
 
+import model.support.enums.Skill
 import model.support.enums.Skill.HALBERD_SKILL
+import model.support.enums.Skill.TWO_HANDED_WEAPON_SKILL
 import model.support.enums.Specification.*
 import model.support.enums.WeaponType.HALBERD
 
-class Halberd(weight: Double, quality: Int) : Weapon(HALBERD, HALBERD_SKILL, weight, quality, false) {
+class Halberd(weight: Double, quality: Int) : Weapon(HALBERD, HALBERD_SKILL, TWO_HANDED_WEAPON_SKILL, weight, quality, false) {
     init {
         damage = mapOf(
                 BLUNT to quality * 0.05,

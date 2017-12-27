@@ -12,6 +12,7 @@ object Constants {
     val FOUR = 4
     val FIVE = 5
     val TEN = 10
+    val FIFTEEN = 15
     val TWENTY = 20
     val THIRTY = 30
     val FORTY = 40
@@ -55,35 +56,35 @@ object Constants {
             ARMOR_SKILL to 0.0,
             HAND_TO_HAND_FIGHT_SKILL to 0.0,
 
-            KNIFE_SKILL to 0.01,
-            SWORD_SKILL to 0.01,
-            AXE_SKILL to 0.01,
-            MACE_SKILL to 0.01,
-            HAMMER_SKILL to 0.01,
+            KNIFE_SKILL to 0.1,
+            SWORD_SKILL to 0.1,
+            AXE_SKILL to 0.1,
+            MACE_SKILL to 0.1,
+            HAMMER_SKILL to 0.1,
 
-            TWO_HANDED_SWORD_SKILL to 0.01,
-            TWO_HANDED_AXE_SKILL to 0.01,
-            TWO_HANDED_MACE_SKILL to 0.01,
-            TWO_HANDED_HAMMER_SKILL to 0.01,
-            STAFF_SKILL to 0.01,
-            SPEAR_SKILL to 0.01,
-            HALBERD_SKILL to 0.01,
+            TWO_HANDED_SWORD_SKILL to 0.1,
+            TWO_HANDED_AXE_SKILL to 0.1,
+            TWO_HANDED_MACE_SKILL to 0.1,
+            TWO_HANDED_HAMMER_SKILL to 0.1,
+            STAFF_SKILL to 0.1,
+            SPEAR_SKILL to 0.1,
+            HALBERD_SKILL to 0.1,
 
-            LIGHT_SHIELD_SKILL to 0.01,
-            MIDDLE_SHIELD_SKILL to 0.01,
-            HEAVY_SHIELD_SKILL to 0.01,
+            LIGHT_SHIELD_SKILL to 0.1,
+            MIDDLE_SHIELD_SKILL to 0.1,
+            HEAVY_SHIELD_SKILL to 0.1,
 
-            CLOTH_ARMOR_SKILL to 0.01,
-            LEATHER_ARMOR_SKILL to 0.01,
-            CHAIN_ARMOR_SKILL to 0.01,
-            SCALY_ARMOR_SKILL to 0.01,
-            LAT_ARMOR_SKILL to 0.01,
+            CLOTH_ARMOR_SKILL to 0.1,
+            LEATHER_ARMOR_SKILL to 0.1,
+            CHAIN_ARMOR_SKILL to 0.1,
+            SCALY_ARMOR_SKILL to 0.1,
+            LAT_ARMOR_SKILL to 0.1,
 
-            HANDS_FIGHT_SKILL to 0.01,
-            FOOTS_FIGHT_SKILL to 0.01,
-            RIGHT_HAND_FIGHT_SKILL to 0.01,
-            LEFT_HAND_FIGHT_SKILL to 0.01,
-            RIGHT_FOOT_FIGHT_SKILL to 0.01,
-            LEFT_FOOT_FIGHT_SKILL to 0.01)
+            HANDS_FIGHT_SKILL to 0.1,
+            FOOTS_FIGHT_SKILL to 0.1,
+            RIGHT_HAND_FIGHT_SKILL to 0.1,
+            LEFT_HAND_FIGHT_SKILL to 0.1,
+            RIGHT_FOOT_FIGHT_SKILL to 0.1,
+            LEFT_FOOT_FIGHT_SKILL to 0.1)
 
 }
