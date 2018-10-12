@@ -2,9 +2,12 @@ package model
 
 import model.equipment.weapon.*
 import model.support.Constants.FIFTY
+import model.support.Constants.PERCENTAGE
+import model.support.Constants.THIRTY
 import model.support.enums.AttackType.*
 import model.support.enums.DefenseType
 import model.support.enums.DefenseType.*
+import model.support.enums.HitPower.*
 import java.io.BufferedWriter
 import java.io.File
 
@@ -70,7 +73,11 @@ object Arena {
         while (first.hasNextTechnique()) {
             defenderHealth = second.health()
 
-            writer.write("    ${first.who} атакует ${
+            writer.write("    ${first.who}${when (first.nextTechniqueInfo().power) {
+                LOW -> " быстро"
+                MEDIUM -> ""
+                HIGH -> " сильно"
+            }} атакует ${
             when (first.nextTechniqueInfo().type) {
                 RIGHT_HAND_ATTACK -> "правой рукой"
                 LEFT_HAND_ATTACK -> "левой рукой"
@@ -85,7 +92,7 @@ object Arena {
                         is Staff -> "посохом"
                         is Sword -> "мечём"
                         is TwoHandedAxe -> "двуручным топором"
-                        is TwoHandedHammer -> "двуручным молотов"
+                        is TwoHandedHammer -> "двуручным молотом"
                         is TwoHandedMace -> "двуручной булавой"
                         is TwoHandedSword -> "двуручным мечём"
                         else -> "чем-то в руке"
@@ -102,18 +109,19 @@ object Arena {
                         is Staff -> "посохом"
                         is Sword -> "мечём"
                         is TwoHandedAxe -> "двуручным топором"
-                        is TwoHandedHammer -> "двуручным молотов"
+                        is TwoHandedHammer -> "двуручным молотом"
                         is TwoHandedMace -> "двуручной булавой"
                         is TwoHandedSword -> "двуручным мечём"
                         else -> "чем-то в руке"
                     }
                 }
-            }} ${second.whom}")
+            }
+            } ${second.whom}")
 
             result = second.defenseFrom(first)
 
             when (result) {
-                COUNTERATTACK -> writer.writeln(", но ${second.who} контратакует.")
+                DODGE_AND_COUNTERATTACK -> writer.writeln(", но ${second.who} контратакует.")
                 DODGE -> {
                     if (!secondOnTheKnees && second.onTheKnees) {
                         secondOnTheKnees = true
@@ -124,30 +132,52 @@ object Arena {
                 BLOCK -> {
                     if (!secondOnTheKnees && second.onTheKnees) {
                         secondOnTheKnees = true
-                        writer.writeln(". ${second.toWhom} удаётся заблокировать его щитом, но он валится на землю без сил.")
+
+                        when {
+                            first.stamina(PERCENTAGE) > THIRTY -> writer.writeln(". ${second.toWhom} удаётся заблокировать его щитом, но он валится на землю от удара.")
+                            else -> writer.writeln(". ${second.toWhom} удаётся заблокировать его щитом, но он валится на землю без сил.")
+                        }
                     } else
                         writer.writeln(", но ${second.toWhom} удаётся заблокировать его щитом.")
                 }
                 PARTIAL_BLOCK -> {
-                    if (!secondOnTheKnees && second.onTheKnees) {
-                        secondOnTheKnees = true
-                        writer.write(". ${second.who} блокируется щитом, но ${first.who} пробивает блок")
-                        if (defenderHealth > second.health())
-                            writer.writeln(", нанося ${defenderHealth - second.health()} урон(а). От удара ${second.who} валится с ног.")
-                        else
-                            writer.writeln(". Хоть и броня защищает от урона, ${second.who} валится с ног от удара.")
-                    } else {
-                        writer.write(". ${second.who} блокируется щитом, но ${first.who} пробивает блок")
-                        if (defenderHealth > second.health())
-                            writer.writeln(" и наносит ${defenderHealth - second.health()} урон(а).")
-                        else
-                            writer.writeln(", хоть и броня защищает от урона.")
+                    when {
+                        second.isAlive -> if (!secondOnTheKnees && second.onTheKnees) {
+                            secondOnTheKnees = true
+                            writer.write(". ${second.who} блокируется щитом, но ${first.who} пробивает блок")
+
+                            when {
+                                first.stamina(PERCENTAGE) > THIRTY -> {
+                                    if (defenderHealth > first.health())
+                                        writer.writeln(", нанося ${defenderHealth - second.health()} урон(а). От удара ${second.who} валится с ног.")
+                                    else
+                                        writer.writeln(". Хоть и броня защищает от урона, ${second.who} валится с ног от удара.")
+                                }
+                                else -> {
+                                    if (defenderHealth > first.health())
+                                        writer.writeln(", нанося ${defenderHealth - second.health()} урон(а). От усталости ${second.who} валится с ног.")
+                                    else
+                                        writer.writeln(". Хоть и броня защищает от урона, ${second.who} валится с ног от усталости.")
+                                }
+                            }
+                        } else {
+                            writer.write(". ${second.who} блокируется щитом, но ${first.who} пробивает блок")
+                            if (defenderHealth > second.health())
+                                writer.writeln(" и наносит ${defenderHealth - second.health()} урон(а).")
+                            else
+                                writer.writeln(", хоть и броня защищает от урона.")
+                        }
+                        else -> writer.writeln(" и наносит ${defenderHealth - second.health()} урон(а).\n\n${second.who} падает при смерти... Бой окончен!")
                     }
                 }
                 ARMOR_DEFENSE -> {
                     if (!secondOnTheKnees && second.onTheKnees) {
                         secondOnTheKnees = true
-                        writer.writeln(". ${second.who} не получает урона благодаря броне, но валится на землю без сил.")
+
+                        when {
+                            first.stamina(PERCENTAGE) > THIRTY -> writer.writeln(". ${second.who} не получает урона благодаря броне, но от удара отлетает на землю.")
+                            else -> writer.writeln(". ${second.who} не получает урона благодаря броне, но валится на землю без сил.")
+                        }
                     } else
                         writer.writeln(", но ${second.who} не получает урона благодаря броне.")
                 }
@@ -156,11 +186,14 @@ object Arena {
                         second.isAlive -> {
                             if (!secondOnTheKnees && second.onTheKnees) {
                                 secondOnTheKnees = true
-                                writer.writeln(" и сильным ударом валит его на землю, нанося ${defenderHealth - second.health()} урон(а).")
+                                when {
+                                    first.stamina(PERCENTAGE) > THIRTY -> writer.writeln(" и сильным ударом валит его на землю, нанося ${defenderHealth - second.health()} урон(а).")
+                                    else -> ". ${first.who} получает ${defenderHealth - second.health()} урон(а) и от усталости падает на землю."
+                                }
                             } else
                                 writer.writeln(" и наносит ему ${defenderHealth - second.health()} урон(а).")
                         }
-                        !second.isAlive -> writer.writeln(" и наносит ${defenderHealth - second.health()} урон(а).\n\n${second.who} падает при смерти... Бой окончен!")
+                        else -> writer.writeln(" и наносит ${defenderHealth - second.health()} урон(а).\n\n${second.who} падает при смерти... Бой окончен!")
                     }
                 }
             }
@@ -174,7 +207,11 @@ object Arena {
         while (second.hasNextTechnique()) {
             defenderHealth = first.health()
 
-            writer.write("    ${second.who} атакует ${
+            writer.write("    ${second.who}${when (second.nextTechniqueInfo().power) {
+                LOW -> " быстро"
+                MEDIUM -> ""
+                HIGH -> " сильно"
+            }} атакует ${
             when (second.nextTechniqueInfo().type) {
                 RIGHT_HAND_ATTACK -> "правой рукой"
                 LEFT_HAND_ATTACK -> "левой рукой"
@@ -189,7 +226,7 @@ object Arena {
                         is Staff -> "посохом"
                         is Sword -> "мечём"
                         is TwoHandedAxe -> "двуручным топором"
-                        is TwoHandedHammer -> "двуручным молотов"
+                        is TwoHandedHammer -> "двуручным молотом"
                         is TwoHandedMace -> "двуручной булавой"
                         is TwoHandedSword -> "двуручным мечём"
                         else -> "чем-то в руке"
@@ -206,7 +243,7 @@ object Arena {
                         is Staff -> "посохом"
                         is Sword -> "мечём"
                         is TwoHandedAxe -> "двуручным топором"
-                        is TwoHandedHammer -> "двуручным молотов"
+                        is TwoHandedHammer -> "двуручным молотом"
                         is TwoHandedMace -> "двуручной булавой"
                         is TwoHandedSword -> "двуручным мечём"
                         else -> "чем-то в руке"
@@ -217,7 +254,7 @@ object Arena {
             result = first.defenseFrom(second)
 
             when (result) {
-                COUNTERATTACK -> writer.writeln(", но ${first.who} контратакует.")
+                DODGE_AND_COUNTERATTACK -> writer.writeln(", но ${first.who} контратакует.")
                 DODGE -> {
                     if (!firstOnTheKnees && first.onTheKnees) {
                         firstOnTheKnees = true
@@ -228,30 +265,53 @@ object Arena {
                 BLOCK -> {
                     if (!firstOnTheKnees && first.onTheKnees) {
                         firstOnTheKnees = true
-                        writer.writeln(". ${first.toWhom} удаётся заблокировать его щитом, но он валится на землю без сил.")
+
+                        when {
+                            first.stamina(PERCENTAGE) > THIRTY -> writer.writeln(". ${first.toWhom} удаётся заблокировать его щитом, но он валится на землю от удара.")
+                            else -> writer.writeln(". ${first.toWhom} удаётся заблокировать его щитом, но он валится на землю без сил.")
+                        }
                     } else
                         writer.writeln(", но ${first.toWhom} удаётся заблокировать его щитом.")
                 }
                 PARTIAL_BLOCK -> {
-                    if (!firstOnTheKnees && first.onTheKnees) {
-                        firstOnTheKnees = true
-                        writer.write(". ${first.who} блокируется щитом, но ${second.who} пробивает блок")
-                        if (defenderHealth > first.health())
-                            writer.writeln(", нанося ${defenderHealth - first.health()} урон(а). От удара ${first.who} валится с ног.")
-                        else
-                            writer.writeln(". Хоть и броня защищает от урона, ${first.who} валится с ног от удара.")
-                    } else {
-                        writer.write(". ${first.who} блокируется щитом, но ${second.who} пробивает блок")
-                        if (defenderHealth > first.health())
-                            writer.writeln(" и наносит ${defenderHealth - first.health()} урон(а).")
-                        else
-                            writer.writeln(", хоть и броня защищает от урона.")
+                    when {
+                        first.isAlive -> if (!firstOnTheKnees && first.onTheKnees) {
+                            firstOnTheKnees = true
+
+                            writer.write(". ${first.who} блокируется щитом, но ${second.who} пробивает блок")
+
+                            when {
+                                first.stamina(PERCENTAGE) > THIRTY -> {
+                                    if (defenderHealth > first.health())
+                                        writer.writeln(", нанося ${defenderHealth - first.health()} урон(а). От удара ${first.who} валится с ног.")
+                                    else
+                                        writer.writeln(". Хоть и броня защищает от урона, ${first.who} валится с ног от удара.")
+                                }
+                                else -> {
+                                    if (defenderHealth > first.health())
+                                        writer.writeln(", нанося ${defenderHealth - first.health()} урон(а). От усталости ${first.who} валится с ног.")
+                                    else
+                                        writer.writeln(". Хоть и броня защищает от урона, ${first.who} валится с ног от усталости.")
+                                }
+                            }
+                        } else {
+                            writer.write(". ${first.who} блокируется щитом, но ${second.who} пробивает блок")
+                            if (defenderHealth > first.health())
+                                writer.writeln(" и наносит ${defenderHealth - first.health()} урон(а).")
+                            else
+                                writer.writeln(", хоть и броня защищает от урона.")
+                        }
+                        else -> writer.writeln(" и наносит ${defenderHealth - first.health()} урон(а).\n\n${first.who} падает при смерти... Бой окончен!")
                     }
                 }
                 ARMOR_DEFENSE -> {
                     if (!firstOnTheKnees && first.onTheKnees) {
                         firstOnTheKnees = true
-                        writer.writeln(". ${first.who} не получает урона благодаря броне, но валится на землю без сил.")
+
+                        when {
+                            first.stamina(PERCENTAGE) > THIRTY -> writer.writeln(". ${first.who} не получает урона благодаря броне, но от удара отлетает на землю.")
+                            else -> writer.writeln(". ${first.who} не получает урона благодаря броне, но валится на землю без сил.")
+                        }
                     } else
                         writer.writeln(", но ${first.who} не получает урона благодаря броне.")
                 }
@@ -260,11 +320,15 @@ object Arena {
                         first.isAlive -> {
                             if (!firstOnTheKnees && first.onTheKnees) {
                                 firstOnTheKnees = true
-                                writer.writeln(" и сильным ударом валит его на землю, нанося ${defenderHealth - second.health()} урон(а).")
+
+                                when {
+                                    first.stamina(PERCENTAGE) > THIRTY -> writer.writeln(" и сильным ударом валит его на землю, нанося ${defenderHealth - first.health()} урон(а).")
+                                    else -> ". ${first.who} получает ${defenderHealth - first.health()} урон(а) и от усталости падает на землю."
+                                }
                             } else
                                 writer.writeln(" и наносит ему ${defenderHealth - first.health()} урон(а).")
                         }
-                        !first.isAlive -> writer.writeln(" и наносит ${defenderHealth - first.health()} урон(а).\n\n${first.who} падает при смерти... Бой окончен!")
+                        else -> writer.writeln(" и наносит ${defenderHealth - first.health()} урон(а).\n\n${first.who} падает при смерти... Бой окончен!")
                     }
                 }
             }

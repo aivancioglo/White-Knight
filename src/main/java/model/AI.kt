@@ -1,6 +1,8 @@
 package model
 
 import model.equipment.Equipment.Companion.NONE
+import model.equipment.shield.Shield
+import model.equipment.weapon.TwoHandedWeapon
 import model.support.Constants.FIVE
 import model.support.Constants.MAX
 import model.support.Constants.NINETY
@@ -111,32 +113,32 @@ object AI {
                                 Technique(your, SECONDARY_WEAPON_ATTACK, HIGH, mostEffectiveSecondaryWeaponSpecification).attackDuration))
                     comboAdded = your.addToNextCombo(SECONDARY_WEAPON_ATTACK, HIGH, mostEffectiveSecondaryWeaponSpecification)
 
-                if (your.equipmentOf(RIGHT_HAND) == NONE && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
+                if (your.equipmentOf(RIGHT_HAND) == NONE && your.equipmentOf(LEFT_HAND) !is TwoHandedWeapon && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
                         enemy.minDefenseDuration() >
                                 Technique(your, RIGHT_HAND_ATTACK, LOW, mostEffectiveRightHandSpecification).attackDuration))
                     comboAdded = your.addToNextCombo(RIGHT_HAND_ATTACK, LOW, mostEffectiveRightHandSpecification)
 
-                if (your.equipmentOf(LEFT_HAND) == NONE && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
+                if (your.equipmentOf(LEFT_HAND) == NONE && your.equipmentOf(RIGHT_HAND) !is TwoHandedWeapon && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
                         enemy.minDefenseDuration() >
                                 Technique(your, LEFT_HAND_ATTACK, LOW, mostEffectiveLeftHandSpecification).attackDuration))
                     comboAdded = your.addToNextCombo(LEFT_HAND_ATTACK, LOW, mostEffectiveLeftHandSpecification)
 
-                if (your.equipmentOf(RIGHT_HAND) == NONE && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
+                if (your.equipmentOf(RIGHT_HAND) == NONE && your.equipmentOf(LEFT_HAND) !is TwoHandedWeapon && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
                         enemy.minDefenseDuration() >
                                 Technique(your, RIGHT_HAND_ATTACK, MEDIUM, mostEffectiveRightHandSpecification).attackDuration))
                     comboAdded = your.addToNextCombo(RIGHT_HAND_ATTACK, MEDIUM, mostEffectiveRightHandSpecification)
 
-                if (your.equipmentOf(LEFT_HAND) == NONE && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
+                if (your.equipmentOf(LEFT_HAND) == NONE && your.equipmentOf(RIGHT_HAND) !is TwoHandedWeapon && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
                         enemy.minDefenseDuration() >
                                 Technique(your, LEFT_HAND_ATTACK, MEDIUM, mostEffectiveLeftHandSpecification).attackDuration))
                     comboAdded = your.addToNextCombo(LEFT_HAND_ATTACK, MEDIUM, mostEffectiveLeftHandSpecification)
 
-                if (your.equipmentOf(RIGHT_HAND) == NONE && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
+                if (your.equipmentOf(RIGHT_HAND) == NONE && your.equipmentOf(LEFT_HAND) !is TwoHandedWeapon && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
                         enemy.minDefenseDuration() >
                                 Technique(your, RIGHT_HAND_ATTACK, HIGH, mostEffectiveRightHandSpecification).attackDuration))
                     comboAdded = your.addToNextCombo(RIGHT_HAND_ATTACK, HIGH, mostEffectiveRightHandSpecification)
 
-                if (your.equipmentOf(LEFT_HAND) == NONE && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
+                if (your.equipmentOf(LEFT_HAND) == NONE && your.equipmentOf(RIGHT_HAND) !is TwoHandedWeapon && (your.skill(MAIN_BATTLE_EXPERIENCE) <= enemy.skill(MAIN_BATTLE_EXPERIENCE) ||
                         enemy.minDefenseDuration() >
                                 Technique(your, LEFT_HAND_ATTACK, HIGH, mostEffectiveLeftHandSpecification).attackDuration))
                     comboAdded = your.addToNextCombo(LEFT_HAND_ATTACK, HIGH, mostEffectiveLeftHandSpecification)

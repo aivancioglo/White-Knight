@@ -3,11 +3,10 @@ package model
 import model.support.enums.AttackType
 import model.support.enums.AttackType.*
 import model.support.enums.HitPower
-import model.support.enums.Skill
-import model.support.enums.Skill.*
+import model.support.enums.Skill.HANDS_FIGHT_SKILL
 import model.support.enums.Specification
 
-data class Technique(val character: Character, val type: AttackType, private val power: HitPower, val specification: Specification) {
+data class Technique(val character: Character, val type: AttackType, val power: HitPower, val specification: Specification) {
     val damage = damage() * power.mod
     val criticalDamage = criticalDamage() * power.mod
     val neededStamina = neededStamina() * power.mod
